@@ -1,0 +1,65 @@
+1 -> npm i next-auth
+2 -> app/api/[...nextauth]/route.js
+3 -> import NextAuth from 'next-auth'
+     import AppleProvider from 'next-auth/providers/apple'
+     import FacebookProvider from 'next-auth/providers/facebook'
+     import GoogleProvider from 'next-auth/providers/google'
+     import EmailProvider from 'next-auth/providers/email'
+     
+     export default NextAuth({
+       providers: [
+         // OAuth authentication providers...
+         AppleProvider({
+           clientId: process.env.APPLE_ID,
+           clientSecret: process.env.APPLE_SECRET
+         }),
+         FacebookProvider({
+           clientId: process.env.FACEBOOK_ID,
+           clientSecret: process.env.FACEBOOK_SECRET
+         }),
+         GoogleProvider({
+           clientId: process.env.GOOGLE_ID,
+           clientSecret: process.env.GOOGLE_SECRET
+         }),
+         // Passwordless / email sign in
+         EmailProvider({
+           server: process.env.MAIL_SERVER,
+           from: 'NextAuth.js <no-reply@example.com>'
+         }),
+       ]
+     })
+
+4 -> layout import this -> import { SessionProvider } from "next-auth/react"
+     do this without cutting any thing import { SessionProvider } from "next-auth/react"
+
+     export default function App({
+       Component, pageProps: { session, ...pageProps }
+     }) {
+       return (
+         <SessionProvider session={session}>
+      <Component {...pageProps}/>
+         </SessionProvider>
+       )
+     }
+
+5 -> in page.js -- client page __
+                                ||
+                                \/
+
+            import { useSession, signIn, signOut } from "next-auth/react"
+            
+            export default function Component() {
+              const { data: session } = useSession()
+              if(session) {
+                return <>
+                  Signed in as {session.user.email} <br/>
+                  <button onClick={() => signOut()}>Sign out</button>
+                </>
+              }
+              return <>
+                Not signed in <br/>
+                <button onClick={() => signIn()}>Sign in</button>
+              </>
+            }
+
+6 -> .env 
